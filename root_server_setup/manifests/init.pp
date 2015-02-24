@@ -10,6 +10,10 @@ class root_server_setup(
   $nw_netmask1   = "255.255.255.0",
   $nw_network1   = "192.168.122.0",
   $nw_gateway1   = "192.168.122.1",
+  $nw_broadcast1 = "192.268.122.255",
+  $nw_dns_nameservers = "",
+  $nw_search     = ""
+
 ) {
 
   # Set up the one and only user with public key authentication.
@@ -29,6 +33,9 @@ class root_server_setup(
     netmask1  => $nw_netmask1,
     network1  => $nw_network1,
     gateway1  => $nw_gateway1,
+    broadcast1 => $nw_broadcast1,
+    dns_nameservers => $nw_dns_nameservers,
+    dns_search => $nw_search,
   }
 
   # Setup Firewall

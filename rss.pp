@@ -7,4 +7,7 @@ class { root_server_setup:
   nw_ipaddr1 => "87.118.84.116",
   nw_network1 => "87.118.84.0",
   nw_gateway1 => "87.118.84.1",
+  nw_broadcast1 => "87.118.84.255",
+  nw_dns_nameservers => "62.141.50.190 84.19.188.171",
+  nw_search => "km20808-05.keymachine.de"
 }
