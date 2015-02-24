@@ -16,20 +16,22 @@ class root_server_setup(
     sshkeys  => $sshkeys
   }
 
+  # Setup Firewall
+  class { root_server_setup::firewall: }
+
   # Harden the OS and the SSH.
   # Please note to enable IPv6.
   
   class { 'os_hardening': 
     enable_ipv6 => "true",
   }
+
+  class { 'root_server_setup::openssh': }
+  ->
   class { 'ssh_hardening':
     server_options => {
       'AddressFamily' => "any",
       'AuthorizedKeysFile' => '/etc/ssh/authorized_keys/%u',
     },
   }
-
-  # Setup Firewall
-
-  class { root_server_setup::firewall: }
 }
