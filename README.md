@@ -106,3 +106,28 @@ Parameters:
 * sshkeys: complete contents of the authorized keys files. This can
   hold more than one key.
 
+#### Firewall
+An IPv4 and IPv6 firewall - based on iptables is set up.  All three
+queues (INPUT, OUTPUT and FORWARD) are enforced.  This means, also
+outgoing communication must be explicitly switched on.
+
+The firewall configuration only sets up the basic rules (LOG, DROP)
+and some basic system ports (e.g. output DNS port).  The appropriate
+ports for the different services are handled during the service
+configuration.
+
+#### OS Hardening
+Based on the Deutsche Telekom Labs hardening requirements, OS
+parameters are changed.  Example: password policy is set accordingly,
+root login is complelety disabled.
+
+All default parameters are used here, except that IPv6 is switched on.
+
+#### SSH Setup and Hardening
+Also for SSH hardening the Deutsche Telekom Labs hardening scripts are
+used.  This contains a complete re-write of the sshd config file.
+
+Public keys are placed in a file that the appropriate user cannot
+change.  Therefore it is impossible that the user itself extends the
+list of keys.
+
