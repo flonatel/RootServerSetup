@@ -4,6 +4,12 @@ class root_server_setup(
   $uid      = '7777',
   $gid      = '7777',
   $sshkeys  = "",
+
+  $nw_device   = "eth0",
+  $nw_ipaddr1  = "192.168.122.2",
+  $nw_netmask1   = "255.255.255.0",
+  $nw_network1   = "192.168.122.0",
+  $nw_gateway1   = "192.168.122.1",
 ) {
 
   # Set up the one and only user with public key authentication.
@@ -17,7 +23,13 @@ class root_server_setup(
   }
 
   # Setup the network device(s)
-  class { root_server_setup::network: }
+  class { root_server_setup::network:
+    device    => $nw_device,
+    ipaddr1   => $nw_ipaddr1,
+    netmask1  => $nw_netmask1,
+    network1  => $nw_network1,
+    gateway1  => $nw_gateway1,
+  }
 
   # Setup Firewall
   class { root_server_setup::firewall: }
