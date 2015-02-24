@@ -5,8 +5,8 @@ class root_server_setup::network(
   $network1   = "192.168.122.0",
   $gateway1   = "192.168.122.1",
   $broadcast1 = "192.168.122.255",
-  $dns_nameservers => "",
-  $dns_search => "",
+  $dns_nameservers = "",
+  $dns_search = "",
 ){
   augeas{ "$device" :
     context => "/files/etc/network/interfaces",
@@ -20,7 +20,7 @@ class root_server_setup::network(
                 "set iface[. = '$device']/network $network1",
                 "set iface[. = '$device']/gateway $gateway1",
                 "set iface[. = '$device']/broadcast $broadcast1",
-                "set iface[. = '$device']/dns-nameservers $dns_nameservers",
+                "set iface[. = '$device']/dns-nameservers \"$dns_nameservers\"",
                 "set iface[. = '$device']/dns-search $dns_search",
                 ],
   }
