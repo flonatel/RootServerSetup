@@ -16,6 +16,9 @@ class root_server_setup(
     sshkeys  => $sshkeys
   }
 
+  # Setup the network device(s)
+  class { root_server_setup::network: }
+
   # Setup Firewall
   class { root_server_setup::firewall: }
 
