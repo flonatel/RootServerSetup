@@ -86,7 +86,7 @@ In the main directory there is a file <tt>rss.pp</tt>. Adapt this to
 your needs then call
 
 ```bash
-puppet apply --modulepath=/etc/puppet/modules:/usr/share/puppet/modules:${PWD} rss.pp
+puppet apply --parser future --modulepath=/etc/puppet/modules:/usr/share/puppet/modules:${PWD} rss.pp
 ```
 
 This sets up the server.
