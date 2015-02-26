@@ -30,7 +30,19 @@ project on github</a> that includes the rules for automatically
 applying these rules with chef or puppet. 
 
 Because IMHO <a href="www.puppetlabs.com">puppet</a> is easier to
-handle, this was chosen for applying the rules. 
+handle, this was chosen for applying the rules.
+
+## Security, Security and Security
+One of the major requirements for a root server placed in the Internet
+is security.
+Be sure: your server will be attacked.
+Do not think, this will not happen to me: it will.
+
+During setup of the DNS for my new root server there were some tries
+to login over ssh from some Chinese IP address.  The server was two
+days old, the uptime was maybe an hour.  There was no service running.
+There was no domain name registered.  I switched off the server when I
+was not configuring it.
 
 ## Setup
 
@@ -120,8 +132,7 @@ For whatever reason the persistent storage of firewall rules does not
 work.  Therefore there is the need to execute
 
 ```bash
-iptables-save >/etc/iptables/rules.v4
-ip6tables-save >/etc/iptables/rules.v6
+netfilter-persistent save
 ```
 
 #### OS Hardening
@@ -239,3 +250,47 @@ INSERT INTO records(domain_id, name, type, content, ttl, change_date)
    	     '2001:1b60:2:FF36:0001::1', 3600, 2015022601);
    
 ```
+
+### fail2ban
+This tool analyzes various log files for possible attackers and tries
+to adapt the iptables firewall before they manage to capture the
+system.
+```bash
+se_apt-get install fail2ban
+```
+
+There is a problem, that the current SELinux rules do not allow
+writing the PID file in the /var/run/fail2ban directory.
+
+To fix this, use:
+
+```bash
+audit2allow -M fail2ban-errata
+type=AVC msg=audit(1424970609.552:185): avc:  denied  { write } for  pid=3092 comm="fail2ban-client" name="fail2ban" dev="tmpfs" ino=16055 scontext=system_u:system_r:fail2ban_client_t:s0 tcontext=system_u:object_r:fail2ban_var_run_t:s0 tclass=dir permissive=0
+[Ctlr-D]
+
+semodule -i fail2ban-errata.pp
+```
+
+Afterwards restart and check:
+
+```bash
+run_init systemctl restart fail2ban
+run_init systemctl status fail2ban
+```
+
+The configuration defaults are ok for this point of time.  Only SSH is
+enabled by default and this is exactly the one an only service that is
+currently started.  We will come back later to configure services here
+as we install them.
+
+Please note that as of this writing 'fail2ban' does not support IPv6.
+
+### psad
+
+This would be a great tool if the SELinux policy is correct.
+Trying to start this gives a long list of AVCs.
+
+Therefore wait until the next release...
+
+

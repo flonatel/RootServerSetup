@@ -1,9 +1,5 @@
 class root_server_setup::firewall {
 
-  package { 'iptables-persistent':
-    ensure => 'installed',
-  }
-  ->
   # iptables purge
   resources { "firewall":
     purge   => true
