@@ -191,4 +191,45 @@ soa-minimum-ttl=60
 
 (Graphite / carbon will be installed later on.)
 
+#### Adding Data
+There is mostly no documentation about how to insert data into the
+PowerDNS database.  There is a Web-Tool that I will not use.
 
+For adding the basics for a new keyweb server.  It is assumed, that
+this is the first domain that is entered and therefore gets the id
+'1'.  You might to change the id in your environment.
+```sql
+INSERT INTO domains(name, type) VALUES('km20808-05.keymachine.de', 'NATIVE');
+
+INSERT INTO records(domain_id, name, type, content, ttl, change_date)
+   VALUES(1, 'km20808-05.keymachine.de', 'SOA',
+   'hostmaster.km20808-05.keymachine.de', 86400, 2015022601);
+
+INSERT INTO records(domain_id, name, type, content, ttl, change_date)
+   VALUES (1, 'km20808-05.keymachine.de', 'NS',
+           'ns.km20808-05.keymachine.de', 86400, 2015022601);
+INSERT INTO records(domain_id, name, type, content, ttl, change_date)
+   VALUES (1, 'km20808-05.keymachine.de', 'NS',
+           'ns2.km20808-05.keymachine.de', 86400, 2015022601);
+
+INSERT INTO records(domain_id, name, type, content, ttl, change_date)
+   VALUES(1, 'ns.km20808-05.keymachine.de', 'A', '87.118.84.116',
+   	     3600, 2015022601);
+INSERT INTO records(domain_id, name, type, content, ttl, change_date)
+   VALUES(1, 'ns1.km20808-05.keymachine.de', 'A', '87.118.84.116',
+   	     3600, 2015022601);
+INSERT INTO records(domain_id, name, type, content, ttl, change_date)
+   VALUES(1, 'hostmaster.km20808-05.keymachine.de', 'A', '87.118.84.116',
+   	     3600, 2015022601);
+
+INSERT INTO records(domain_id, name, type, content, ttl, change_date)
+   VALUES(1, 'ns.km20808-05.keymachine.de', 'AAAA', '2001:1b60:2:FF36:0001::1',
+   	     3600, 2015022601);
+INSERT INTO records(domain_id, name, type, content, ttl, change_date)
+   VALUES(1, 'ns1.km20808-05.keymachine.de', 'AAAA',
+   	     '2001:1b60:2:FF36:0001::1', 3600, 2015022601);
+INSERT INTO records(domain_id, name, type, content, ttl, change_date)
+   VALUES(1, 'hostmaster.km20808-05.keymachine.de', 'AAAA',
+   	     '2001:1b60:2:FF36:0001::1', 3600, 2015022601);
+   
+```
