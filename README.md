@@ -116,6 +116,14 @@ and some basic system ports (e.g. output DNS port).  The appropriate
 ports for the different services are handled during the service
 configuration.
 
+For whatever reason the persistent storage of firewall rules does not
+work.  Therefore there is the need to execute
+
+```bash
+iptables-save >/etc/iptables/rules.v4
+ip6tables-save >/etc/iptables/rules.v6
+```
+
 #### OS Hardening
 Based on the Deutsche Telekom Labs hardening requirements, OS
 parameters are changed.  Example: password policy is set accordingly,
