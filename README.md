@@ -221,6 +221,9 @@ INSERT INTO records(domain_id, name, type, content, ttl, change_date)
 INSERT INTO records(domain_id, name, type, content, ttl, change_date)
    VALUES(1, 'hostmaster.km20808-05.keymachine.de', 'A', '87.118.84.116',
    	     3600, 2015022601);
+INSERT INTO records(domain_id, name, type, content, ttl, change_date)
+   VALUES(1, 'rs3.km20808-05.keymachine.de', 'A', '87.118.84.116',
+   	     3600, 2015022601);
 
 INSERT INTO records(domain_id, name, type, content, ttl, change_date)
    VALUES(1, 'ns.km20808-05.keymachine.de', 'AAAA', '2001:1b60:2:FF36:0001::1',
@@ -230,6 +233,9 @@ INSERT INTO records(domain_id, name, type, content, ttl, change_date)
    	     '2001:1b60:2:FF36:0001::1', 3600, 2015022601);
 INSERT INTO records(domain_id, name, type, content, ttl, change_date)
    VALUES(1, 'hostmaster.km20808-05.keymachine.de', 'AAAA',
+   	     '2001:1b60:2:FF36:0001::1', 3600, 2015022601);
+INSERT INTO records(domain_id, name, type, content, ttl, change_date)
+   VALUES(1, 'rs3.km20808-05.keymachine.de', 'AAAA',
    	     '2001:1b60:2:FF36:0001::1', 3600, 2015022601);
    
 ```
