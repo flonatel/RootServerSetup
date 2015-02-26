@@ -24,7 +24,7 @@ aim is to automate as much as possible. Let's see what can be done.
 Some of the default operating system settings should not used in a
 production environment.  Especially big companies have their own
 special requirements when it comes to security and hardening.  The <a
-href="www.telekom.com">Deutsche Telekom</a> published their
+href="http://www.telekom.com">Deutsche Telekom</a> published their
 requirements and created <a href="https://github.com/TelekomLabs">a
 project on github</a> that includes the rules for automatically
 applying these rules with chef or puppet. 
