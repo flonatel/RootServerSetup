@@ -131,3 +131,56 @@ Public keys are placed in a file that the appropriate user cannot
 change.  Therefore it is impossible that the user itself extends the
 list of keys.
 
+### Postgresql Installation
+For some applications (Wordpress, PowerDNS, ...) postgresql is used.
+
+```bash
+apt-get install postgresql
+```
+
+Default installation will do: database will only a small one and
+there will be no heavy use.  All access is from localhost only.
+
+To follow the Deutsche Telekom Labs requirements, you might want to
+change the paramters 'log_connections' and 'log_disconnections' to
+'on' in the file '/etc/postgresql/9.4/main/postgresql.conf'.
+
+Afterwards a restart is needed:
+
+```bash
+systemctl restart postgresql
+```
+
+(I'll ignore the requirement, to delete the automatically generated
+links to the self-signed server certificate: all communication to and
+from the database will be local only.)
+
+### PowerDNS
+Because I want to automatically update some of my DNS resolutions,
+PowerDNS with a postgresql backend is used (bind does not support
+database backends).
+
+```bash
+apt-get install pdns-server pdns-backend-pgsql
+```
+
+If you a querried if you want to install the database scheme, chose
+'Yes'.
+
+Either chose a password or let PowerDNS chose a random one.
+
+The password for accessing the database is written into the file
+'/etc/powerdns/pdns.d/pdns.local.gpgsql.conf'.
+
+Changes to this file:
+```
+allow-recursion=127.0.0.1,::1
+carbon-interval=60
+carbon-server=::1
+local-ipv6=::/128
+soa-minimum-ttl=60
+```
+
+(Graphite / carbon will be installed later on.)
+
+

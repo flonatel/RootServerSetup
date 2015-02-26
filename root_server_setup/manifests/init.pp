@@ -43,6 +43,8 @@ class root_server_setup(
 
   # Harden the OS and the SSH.
   # Please note to enable IPv6.
+
+  class { 'root_server_setup::powerdns': }
   
   class { 'os_hardening': 
     enable_ipv6 => "true",

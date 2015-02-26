@@ -42,11 +42,11 @@ class root_server_setup::firewall_pre {
     action   => 'accept',
   }  
 
-#  firewall { '200 allow outgoing http':
-#    chain    => 'OUTPUT',
-#    state    => ['NEW'],
-#    dport    => '80',
-#    proto    => 'tcp',
-#    action   => 'accept',
-#  }  
+  firewall { '200 allow outgoing http':
+    chain    => 'OUTPUT',
+    state    => ['NEW'],
+    dport    => '80',
+    proto    => 'tcp',
+    action   => 'accept',
+  }  
 }
