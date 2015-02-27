@@ -56,6 +56,7 @@ class root_server_setup(
     server_options => {
       'AddressFamily' => "any",
       'AuthorizedKeysFile' => '/etc/ssh/authorized_keys/%u',
+      'ListenAddress' => ['0.0.0.0', '2001:1b60:2:ff36:1::101'],
     },
   }
 }

@@ -4,6 +4,21 @@ class root_server_setup::firewall_pre {
     require => undef,
   }
 
+  # For IPv6 ICMP must be allowed: many features rely on this.
+  firewall { '000 accept all icmp IPv6 INPUT':
+    provider   => 'ip6tables',
+    chain    => 'INPUT',
+    proto   => 'ipv6-icmp',
+    action  => 'accept',
+  }
+  
+  firewall { '000 accept all icmp IPv6 OUTPUT':
+    provider   => 'ip6tables',
+    chain    => 'OUTPUT',
+    proto   => 'ipv6-icmp',
+    action  => 'accept',
+  }
+
   $ipv = [4, 6]
   each($ipv) |$vers| {
     $provider = $vers ? {

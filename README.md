@@ -279,12 +279,17 @@ currently started.  We will come back later to configure services here
 as we install them.
 
 Please note that as of this writing 'fail2ban' does not support IPv6.
+IPv6 support must be 'patched' in.  There is a <a
+href="http://crycode.de/wiki/Fail2Ban">good description</a> available.
 
-### psad
+After the change, the SELinux contexts must be corrected:
 
-This would be a great tool if the SELinux policy is correct.
-Trying to start this gives a long list of AVCs.
+```bash
+chcon --reference=/sbin/iptables /usr/bin/ip64tables
+chcon --reference=/etc/fail2ban/action.d/apf.conf /etc/fail2ban/action.d/ip64tables-multiport.conf
+chcon --reference=/etc/fail2ban/action.d/apf.conf /etc/fail2ban/action.d/ip64tables-allports.conf
+```
 
-Therefore wait until the next release...
-
+### EMail Server: Postfix
+There are a couple of EMail servers out there.  I'll use postfix.
 
