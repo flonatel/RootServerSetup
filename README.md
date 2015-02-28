@@ -260,7 +260,11 @@ To fix this, use:
 
 ```bash
 audit2allow -M fail2ban-errata
-type=AVC msg=audit(1424970609.552:185): avc:  denied  { write } for  pid=3092 comm="fail2ban-client" name="fail2ban" dev="tmpfs" ino=16055 scontext=system_u:system_r:fail2ban_client_t:s0 tcontext=system_u:object_r:fail2ban_var_run_t:s0 tclass=dir permissive=0
+type=AVC msg=audit(1425105614.776:76): avc:  denied  { write } for  pid=837 comm="fail2ban-client" name="fail2ban" dev="tmpfs" ino=13031 scontext=system_u:system_r:fail2ban_client_t:s0 tcontext=system_u:object_r:var_run_t:s0 tclass=dir permissive=0
+type=AVC msg=audit(1425105923.020:108): avc:  denied  { create } for  pid=947 comm="fail2ban-server" name="fail2ban.sock" scontext=system_u:system_r:fail2ban_t:s0 tcontext=system_u:object_r:var_run_t:s0 tclass=sock_file permissive=0
+type=AVC msg=audit(1425106118.560:418): avc:  denied  { write } for  pid=999 comm="fail2ban-client" name="fail2ban.sock" dev="tmpfs" ino=16759 scontext=system_u:system_r:fail2ban_client_t:s0 tcontext=system_u:object_r:var_run_t:s0 tclass=sock_file permissive=0
+type=AVC msg=audit(1425106256.324:425): avc:  denied  { getattr } for  pid=1002 comm="fail2ban-server" path="/run/fail2ban/fail2ban.sock" dev="tmpfs" ino=16759 scontext=system_u:system_r:fail2ban_t:s0 tcontext=system_u:object_r:var_run_t:s0 tclass=sock_file permissive=0
+type=AVC msg=audit(1425107499.072:468): avc:  denied  { unlink } for  pid=1105 comm="fail2ban-server" name="fail2ban.sock" dev="tmpfs" ino=17816 scontext=system_u:system_r:fail2ban_t:s0 tcontext=system_u:object_r:var_run_t:s0 tclass=sock_file permissive=0
 [Ctlr-D]
 
 semodule -i fail2ban-errata.pp
@@ -272,12 +276,6 @@ Afterwards restart and check:
 run_init systemctl restart fail2ban
 run_init systemctl status fail2ban
 ```
-
-The configuration defaults are ok for this point of time.  Only SSH is
-enabled by default and this is exactly the one an only service that is
-currently started.  We will come back later to configure services here
-as we install them.
-
 Please note that as of this writing 'fail2ban' does not support IPv6.
 IPv6 support must be 'patched' in.  There is a <a
 href="http://crycode.de/wiki/Fail2Ban">good description</a> available.
@@ -290,6 +288,61 @@ chcon --reference=/etc/fail2ban/action.d/apf.conf /etc/fail2ban/action.d/ip64tab
 chcon --reference=/etc/fail2ban/action.d/apf.conf /etc/fail2ban/action.d/ip64tables-allports.conf
 ```
 
+For later configuration changes and additions, copy over the system
+configuration file where it gets picked up and not overwritten by
+future config updates.
+
+```bash
+cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
+chcon --reference /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
+```
+
+Because I'm paranoid, I change the blocktype from ICMP host
+unreachable to DROP in '/etc/fail2ban/action.d/iptables-blocktype.conf'.
+
+#### Ban IPs (Portscans)
+If somebody sends a packet to a port that is not open, directly ban the approriate IP.
+
+Add the file 'portscan.conf' to the dir '/etc/fail2ban/filter.d':
+
+```
+# Option: failregex
+# Notes: Looks for attempts on ports not open in your
+firewall. Expects the
+# iptables logging utility to be used. Add the following to your
+iptables
+# config, as the last item before you DROP or REJECT:
+[Definition]
+failregex = ^.*[IPTABLES INPUT IPv4].*SRC=<HOST>.*\[SRC=.*$
+	      ^.*[IPTABLES INPUT IPv4].*SRC=<HOST>.*$
+	      
+ignoreregex = ^.*[IPTABLES INPUT IPv4].*SRC=0.0.0.0.*$
+```
+
+Add the following section to the '/etc/fail2ban/jail.local':
+```
+[portscan]
+enabled = true
+filter  = portscan
+action  = iptables[name=portscan]
+logpath = /var/log/messages
+maxretry = 1
+bantime  = 86400
+```
+
 ### EMail Server: Postfix
 There are a couple of EMail servers out there.  I'll use postfix.
 
+First run 
+```bash
+postfix-nochroot
+```
+
+In my installation the SELinux context was not correctly set for the
+installed directories.  The command to do this manually:
+
+```bash
+restorecon -vR /var/spool/postfix
+```
+
+#### Ban IPs that deliver spam

@@ -12,7 +12,7 @@ class root_server_setup::firewall_post {
       chain      => 'INPUT',
       jump       => 'LOG',
       log_level  => '6',
-      log_prefix => "[IPTABLES INPUT IPv$vers] dropped ",
+      log_prefix => "[IPTABLES INPUT IPv$vers] DROP ",
       proto      => 'all',
       before     => undef,
     }
@@ -22,7 +22,7 @@ class root_server_setup::firewall_post {
       chain      => 'FORWARD',
       jump       => 'LOG',
       log_level  => '6',
-      log_prefix => "[IPTABLES FORWARD IPv$vers] dropped ",
+      log_prefix => "[IPTABLES FORWARD IPv$vers] DROP ",
       proto      => 'all',
       before     => undef,
     }
@@ -32,7 +32,7 @@ class root_server_setup::firewall_post {
       chain      => 'OUTPUT',
       jump       => 'LOG',
       log_level  => '6',
-      log_prefix => "[IPTABLES OUTPUT IPv$vers] dropped ",
+      log_prefix => "[IPTABLES OUTPUT IPv$vers] DROP ",
       proto      => 'all',
       before     => undef,
     }

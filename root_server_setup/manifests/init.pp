@@ -45,6 +45,7 @@ class root_server_setup(
   # Please note to enable IPv6.
 
   class { 'root_server_setup::powerdns': }
+  class { 'root_server_setup::postfix': }
   
   class { 'os_hardening': 
     enable_ipv6 => "true",
