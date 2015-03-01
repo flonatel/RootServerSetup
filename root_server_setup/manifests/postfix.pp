@@ -15,5 +15,13 @@ class root_server_setup::postfix {
       proto    => 'tcp',
       action   => 'accept',
     }
+    firewall { "302 allow outgoing SMTP (UDP/IPv$vers)":
+      provider   => $provider,
+      chain    => 'OUTPUT',
+      state    => ['NEW'],
+      dport    => '25',
+      proto    => 'tcp',
+      action   => 'accept',
+    }
   }
 }

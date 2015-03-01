@@ -250,6 +250,8 @@ This tool analyzes various log files for possible attackers and tries
 to adapt the iptables firewall before they manage to capture the
 system.
 ```bash
+se_apt-get install python3
+se_dpkg -i fail2ban_0.9.1-1_all.deb
 se_apt-get install fail2ban
 ```
 
@@ -265,6 +267,9 @@ type=AVC msg=audit(1425105923.020:108): avc:  denied  { create } for  pid=947 co
 type=AVC msg=audit(1425106118.560:418): avc:  denied  { write } for  pid=999 comm="fail2ban-client" name="fail2ban.sock" dev="tmpfs" ino=16759 scontext=system_u:system_r:fail2ban_client_t:s0 tcontext=system_u:object_r:var_run_t:s0 tclass=sock_file permissive=0
 type=AVC msg=audit(1425106256.324:425): avc:  denied  { getattr } for  pid=1002 comm="fail2ban-server" path="/run/fail2ban/fail2ban.sock" dev="tmpfs" ino=16759 scontext=system_u:system_r:fail2ban_t:s0 tcontext=system_u:object_r:var_run_t:s0 tclass=sock_file permissive=0
 type=AVC msg=audit(1425107499.072:468): avc:  denied  { unlink } for  pid=1105 comm="fail2ban-server" name="fail2ban.sock" dev="tmpfs" ino=17816 scontext=system_u:system_r:fail2ban_t:s0 tcontext=system_u:object_r:var_run_t:s0 tclass=sock_file permissive=0
+type=AVC msg=audit(1425207506.772:8156): avc:  denied  { read } for  pid=874 comm="fail2ban-client" name="urandom" dev="devtmpfs" ino=5598 scontext=system_u:system_r:fail2ban_client_t:s0 tcontext=system_u:object_r:urandom_device_t:s0 tclass=chr_file permissive=0
+type=AVC msg=audit(1425207694.272:8197): avc:  denied  { open } for  pid=920 comm="fail2ban-client" path="/dev/urandom" dev="devtmpfs" ino=5598 scontext=system_u:system_r:fail2ban_client_t:s0 tcontext=system_u:object_r:urandom_device_t:s0 tclass=chr_file permissive=0
+type=AVC msg=audit(1425207805.068:8225): avc:  denied  { getattr } for  pid=955 comm="fail2ban-client" path="/dev/urandom" dev="devtmpfs" ino=5598 scontext=system_u:system_r:fail2ban_client_t:s0 tcontext=system_u:object_r:urandom_device_t:s0 tclass=chr_file permissive=0
 [Ctlr-D]
 
 semodule -i fail2ban-errata.pp
@@ -288,17 +293,24 @@ chcon --reference=/etc/fail2ban/action.d/apf.conf /etc/fail2ban/action.d/ip64tab
 chcon --reference=/etc/fail2ban/action.d/apf.conf /etc/fail2ban/action.d/ip64tables-allports.conf
 ```
 
-For later configuration changes and additions, copy over the system
-configuration file where it gets picked up and not overwritten by
-future config updates.
+Configuration will be done in the '/etc/fail2ban/jail.d' directory. Do
+not use the deprecated 'jail.local' any more.
 
-```bash
-cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
-chcon --reference /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
+My '/etc/fail2ban/jail.d/settings.conf':
+```
+[DEFAULT]
+bantime = 86400
+destmail = root@km20808-05.keymachine.de
+sender = fail2ban@km20808-05.keymachine.de
+mta = unkown
+banaction = ip64tables-multiport
 ```
 
+(Default SELinux works.)
+
 Because I'm paranoid, I change the blocktype from ICMP host
-unreachable to DROP in '/etc/fail2ban/action.d/iptables-blocktype.conf'.
+unreachable to DROP in '/etc/fail2ban/action.d/iptables-blocktype.conf'
+and '/etc/fail2ban/action.d/iptables-common.conf'
 
 #### Ban IPs (Portscans)
 If somebody sends a packet to a port that is not open, directly ban the approriate IP.
@@ -307,10 +319,8 @@ Add the file 'portscan.conf' to the dir '/etc/fail2ban/filter.d':
 
 ```
 # Option: failregex
-# Notes: Looks for attempts on ports not open in your
-firewall. Expects the
-# iptables logging utility to be used. Add the following to your
-iptables
+# Notes: Looks for attempts on ports not open in your firewall. Expects the
+# iptables logging utility to be used. Add the following to your iptables
 # config, as the last item before you DROP or REJECT:
 [Definition]
 failregex = ^.*[IPTABLES INPUT IPv4].*SRC=<HOST>.*\[SRC=.*$
@@ -319,12 +329,12 @@ failregex = ^.*[IPTABLES INPUT IPv4].*SRC=<HOST>.*\[SRC=.*$
 ignoreregex = ^.*[IPTABLES INPUT IPv4].*SRC=0.0.0.0.*$
 ```
 
-Add the following section to the '/etc/fail2ban/jail.local':
+And the portscan action that goes to '/etc/fail2ban/jail.d/portscan.conf':
 ```
 [portscan]
 enabled = true
 filter  = portscan
-action  = iptables[name=portscan]
+action  = ip64tables-allports[name=portscan]
 logpath = /var/log/messages
 maxretry = 1
 bantime  = 86400
@@ -344,5 +354,64 @@ installed directories.  The command to do this manually:
 ```bash
 restorecon -vR /var/spool/postfix
 ```
+
+Create a virtual mail spool with the following properties:
+
+```bash
+drwx------. 3 postfix postdrop unconfined_u:object_r:mail_spool_t:SystemLow 4096 Feb 28 18:59 /var/spool/postfix/vhosts/
+```
+
+For each mail domain you host, you need to create an appropriate
+subdirectrory with the name of the domain.  The subdirectory must have
+the same labels and permissions.
+
+Add the following lines to the file '/etc/postfix/main.cf':
+
+
+```
+# Virtual Users
+virtual_mailbox_domains = km20808-05.keymachine.de somedomain.net
+virtual_mailbox_base = /var/spool/postfix/vhosts
+virtual_mailbox_maps = hash:/etc/postfix/vmailbox
+virtual_minimum_uid = 100
+virtual_uid_maps = static:111
+virtual_gid_maps = static:117
+virtual_alias_maps = hash:/etc/postfix/virtual
+```
+
+Create the files vmailbox and virtual (see <a
+href="http://www.postfix.org/VIRTUAL_README.html">postfix
+documentation</a>. 
+
+fail2ban configuration for postfix is setting 'enable'
+to true in the postfix section.  Also I add 'maxretry = 1'
+and 'bantime  = 604800' - I really hate SPAM.
+
+In the current fail2ban packet there is a problem:
+in the file '/etc/fail2ban/filter.d/postfix.conf' the
+command pipelining must be changed to
+
+in the line 'command pipelining after' you need to add a ']' after the *.
+```
+^%(__prefix_line)simproper command pipelining after \S+ from [^\[\]]*\[<HOST>\]:.*$
+```
+
+Also add the line
+```
+^%(__prefix_line)sNOQUEUE: reject: RCPT from \S+\[<HOST>\]: 454 4\.7\.1 .* Relay access denied;.*$
+```
+that matches relay delivery.
+
+Also the '__prefix_line' definition in the common.conf does not match
+the default syslog output.  Change it to:
+
+```
+__prefix_line = [A-Za-z0-9 :]*%(__bsd_syslog_verbose)s?\s*(?:%(__hostname)s )?(?:%(__kernel_prefix)s )?(?:@vserver_\S+ )?%(__daemon_combs_re)s?\s?%(__daemon_extra_re)s?\s*
+```
+
+#### SSHD
+-# This will be possible with fail2ban 0.9
+-#          (?m)^%(__prefix_line)sConnection from <HOST> port \d* on .* port \d*.*$%(__prefix_line)sfatal: Unable to negotiate a key exchange method \[preauth\]$
+
 
 #### Ban IPs that deliver spam
