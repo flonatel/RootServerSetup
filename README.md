@@ -306,7 +306,7 @@ mta = unkown
 banaction = ip64tables-multiport
 ```
 
-(Default SELinux works.)
+(Default SELinux contexts works.)
 
 Because I'm paranoid, I change the blocktype from ICMP host
 unreachable to DROP in '/etc/fail2ban/action.d/iptables-blocktype.conf'
@@ -339,6 +339,25 @@ logpath = /var/log/messages
 maxretry = 1
 bantime  = 86400
 ```
+
+#### SSH Brakin Attempts
+Shortly after setting up the server, I got some messages like:
+```
+Mar 01 14:15:01 rs3 sshd[18388]: Connection from 115.239.228.15 port 40421 on 87.118.84.116 port 22
+Mar 01 14:15:02 rs3 sshd[18388]: fatal: Unable to negotiate a key exchange method [preauth]
+```
+
+These are break-in attemts from some Chinese location.  To be able to
+check multiline regular expressions, fail2ban >0.9 is needed.
+
+To catch these, add the following line to the section failregex in
+'/etc/fail2ban/filter.d/sshd.conf':
+
+```
+^%(__prefix_line)sConnection from <HOST> port \d* on .* port \d*.*$%(__prefix_line)sfatal: Unable to negotiate a key exchange method \[preauth\]$
+```
+
+Afterwards restart fail2ban.
 
 ### EMail Server: Postfix
 There are a couple of EMail servers out there.  I'll use postfix.
@@ -379,9 +398,11 @@ virtual_gid_maps = static:117
 virtual_alias_maps = hash:/etc/postfix/virtual
 ```
 
+Here the uid and gid should map to postfix.
+
 Create the files vmailbox and virtual (see <a
 href="http://www.postfix.org/VIRTUAL_README.html">postfix
-documentation</a>. 
+documentation</a>. )
 
 fail2ban configuration for postfix is setting 'enable'
 to true in the postfix section.  Also I add 'maxretry = 1'
@@ -389,9 +410,8 @@ and 'bantime  = 604800' - I really hate SPAM.
 
 In the current fail2ban packet there is a problem:
 in the file '/etc/fail2ban/filter.d/postfix.conf' the
-command pipelining must be changed to
+command pipelining must be changed to:
 
-in the line 'command pipelining after' you need to add a ']' after the *.
 ```
 ^%(__prefix_line)simproper command pipelining after \S+ from [^\[\]]*\[<HOST>\]:.*$
 ```
@@ -408,10 +428,5 @@ the default syslog output.  Change it to:
 ```
 __prefix_line = [A-Za-z0-9 :]*%(__bsd_syslog_verbose)s?\s*(?:%(__hostname)s )?(?:%(__kernel_prefix)s )?(?:@vserver_\S+ )?%(__daemon_combs_re)s?\s?%(__daemon_extra_re)s?\s*
 ```
-
-#### SSHD
--# This will be possible with fail2ban 0.9
--#          (?m)^%(__prefix_line)sConnection from <HOST> port \d* on .* port \d*.*$%(__prefix_line)sfatal: Unable to negotiate a key exchange method \[preauth\]$
-
 
 #### Ban IPs that deliver spam
