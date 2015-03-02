@@ -7,7 +7,7 @@ class root_server_setup::postfix {
       6 => 'ip6tables',
     }
     
-    firewall { "301 allow incoming SMTP (UDP/IPv$vers)":
+    firewall { "301 allow incoming SMTP (IPv$vers)":
       provider   => $provider,
       chain    => 'INPUT',
       state    => ['NEW'],
@@ -15,7 +15,7 @@ class root_server_setup::postfix {
       proto    => 'tcp',
       action   => 'accept',
     }
-    firewall { "302 allow outgoing SMTP (UDP/IPv$vers)":
+    firewall { "302 allow outgoing SMTP (IPv$vers)":
       provider   => $provider,
       chain    => 'OUTPUT',
       state    => ['NEW'],

@@ -27,16 +27,16 @@ class root_server_setup(
   }
 
   # Setup the network device(s)
-  class { root_server_setup::network:
-    device    => $nw_device,
-    ipaddr1   => $nw_ipaddr1,
-    netmask1  => $nw_netmask1,
-    network1  => $nw_network1,
-    gateway1  => $nw_gateway1,
-    broadcast1 => $nw_broadcast1,
-    dns_nameservers => $nw_dns_nameservers,
-    dns_search => $nw_search,
-  }
+#  class { root_server_setup::network:
+#    device    => $nw_device,
+#    ipaddr1   => $nw_ipaddr1,
+#    netmask1  => $nw_netmask1,
+#    network1  => $nw_network1,
+#    gateway1  => $nw_gateway1,
+#    broadcast1 => $nw_broadcast1,
+#    dns_nameservers => $nw_dns_nameservers,
+#    dns_search => $nw_search,
+#  }
 
   # Setup Firewall
   class { root_server_setup::firewall: }
@@ -44,8 +44,12 @@ class root_server_setup(
   # Harden the OS and the SSH.
   # Please note to enable IPv6.
 
+  class { 'root_server_setup::openvpn': }
   class { 'root_server_setup::powerdns': }
   class { 'root_server_setup::postfix': }
+  class { 'root_server_setup::dovecot': }
+  class { 'root_server_setup::spamfilter': }
+  class { 'root_server_setup::apache': }
   
   class { 'os_hardening': 
     enable_ipv6 => "true",
