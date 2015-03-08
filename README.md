@@ -467,7 +467,7 @@ in the master.cf file.
 This is the IMAP service for accessing mails.
 
 ```bash
-se_apt-get install dovecot-core dovecot-imapd
+se_apt-get install dovecot-core dovecot-imapd dovecot-sieve dovecot-managesieved
 ```
 
 restorecon -R /var/lib/dovecot
@@ -539,6 +539,14 @@ type=AVC msg=audit(1425303338.504:27259): avc:  denied  { ioctl } for  pid=30546
 type=AVC msg=audit(1425303419.276:27278): avc:  denied  { getattr } for  pid=30597 comm="/usr/sbin/amavi" path="/etc/razor" dev="dm-0" ino=6031044 scontext=system_u:system_r:amavis_t:s0 tcontext=system_u:object_r:razor_etc_t:s0 tclass=dir permissive=0
 type=AVC msg=audit(1425303419.512:27280): avc:  denied  { open } for  pid=30598 comm="pyzor" path="/usr/share/pyshared/pyzor/client.py" dev="dm-0" ino=12849153 scontext=system_u:system_r:pyzor_t:s0 tcontext=system_u:object_r:usr_t:s0 tclass=file permissive=0
 type=AVC msg=audit(1425303579.632:27298): avc:  denied  { create } for  pid=30661 comm="pyzor" name=".pyzor" scontext=system_u:system_r:pyzor_t:s0 tcontext=system_u:object_r:amavis_var_lib_t:s0 tclass=dir permissive=0
+type=AVC msg=audit(1425381483.220:41038): avc:  denied  { getattr } for  pid=29034 comm="postdrop" path="/var/spool/postfix/public/pickup" dev="dm-0" ino=8258419 scontext=system_u:system_r:postfix_postdrop_t:s0-s0:c0.c1023 tcontext=system_u:object_r:postfix_public_t:s0 tclass=sock_file permissive=0
+type=AVC msg=audit(1425381483.044:41037): avc:  denied  { use } for  pid=29033 comm="sendmail" path="socket:[12302]" dev="sockfs" ino=12302 scontext=system_u:system_r:system_mail_t:s0-s0:c0.c1023 tcontext=system_u:system_r:init_t:s0 tclass=fd permissive=0
+type=AVC msg=audit(1425381482.176:41031): avc:  denied  { read } for  pid=29031 comm="pyzor" name="servers" dev="dm-0" ino=8259161 scontext=system_u:system_r:system_cronjob_t:s0-s0:c0.c1023 tcontext=system_u:object_r:amavis_var_lib_t:s0 tclass=file permissive=0
+type=AVC msg=audit(1425381482.228:41032): avc:  denied  { ioctl } for  pid=29032 comm="sa-learn" path=2F746D702F746D706639656C653731202864656C6574656429 dev="dm-0" ino=9699390 scontext=system_u:system_r:system_cronjob_t:s0-s0:c0.c1023 tcontext=system_u:object_r:crond_tmp_t:s0 tclass=file permissive=0
+type=AVC msg=audit(1425381483.008:41033): avc:  denied  { read } for  pid=29032 comm="sa-learn" name="body_0.pm" dev="dm-0" ino=8259129 scontext=system_u:system_r:system_cronjob_t:s0-s0:c0.c1023 tcontext=system_u:object_r:spamd_compiled_t:s0 tclass=file permissive=0
+type=AVC msg=audit(1425381483.032:41034): avc:  denied  { read } for  pid=29032 comm="sa-learn" name="bayes_toks" dev="dm-0" ino=8259157 scontext=system_u:system_r:system_cronjob_t:s0-s0:c0.c1023 tcontext=system_u:object_r:amavis_var_lib_t:s0 tclass=file permissive=0
+type=AVC msg=audit(1425381483.032:41035): avc:  denied  { node_bind } for  pid=29032 comm="sa-learn" scontext=system_u:system_r:system_cronjob_t:s0-s0:c0.c1023 tcontext=system_u:object_r:node_t:s0 tclass=udp_socket permissive=0
+type=AVC msg=audit(1425381482.140:41020): avc:  denied  { append } for  pid=29029 comm="perl" name="razor-agent.log" dev="dm-0" ino=8259144 scontext=system_u:system_r:system_cronjob_t:s0-s0:c0.c1023 tcontext=system_u:object_r:amavis_var_lib_t:s0 tclass=file permissive=0
 [CTRL-D]
 ```
 
@@ -586,7 +594,7 @@ setsebool -P httpd_can_network_connect on
 Not get all all X dependencies, that are not needed, use:
 
 ```bash
-se_apt-get install --no-install-recommends collectd
+se_apt-get install --no-install-recommends collectd liboping0
 setsebool -P collectd_tcp_network_connect on
 ```
 
@@ -595,7 +603,32 @@ audit2allow -M collectd-errata
 type=AVC msg=audit(1425322360.160:35562): avc:  denied  { read } for  pid=13129 comm="collectd" name="utmp" dev="tmpfs" ino=10571 scontext=system_u:system_r:collectd_t:s0 tcontext=system_u:object_r:initrc_var_run_t:s0 tclass=file permissive=0
 type=AVC msg=audit(1425322417.008:35570): avc:  denied  { open } for  pid=13316 comm="collectd" path="/run/utmp" dev="tmpfs" ino=10571 scontext=system_u:system_r:collectd_t:s0 tcontext=system_u:object_r:initrc_var_run_t:s0 tclass=file permissive=0
 type=AVC msg=audit(1425322493.008:35582): avc:  denied  { lock } for  pid=13366 comm="collectd" path="/run/utmp" dev="tmpfs" ino=10571 scontext=system_u:system_r:collectd_t:s0 tcontext=system_u:object_r:initrc_var_run_t:s0 tclass=file permissive=0
+type=AVC msg=audit(1425363226.312:38515): avc:  denied  { net_admin } for  pid=5449 comm="collectd" capability=12  scontext=system_u:system_r:collectd_t:s0 tcontext=system_u:system_r:collectd_t:s0 tclass=capability permissive=0
+type=AVC msg=audit(1425559539.160:51634): avc:  denied  { create } for  pid=28249 comm="collectd" scontext=system_u:system_r:collectd_t:s0 tcontext=system_u:system_r:collectd_t:s0 tclass=rawip_socket permissive=0
+type=AVC msg=audit(1425559699.980:51649): avc:  denied  { net_raw } for  pid=28457 comm="collectd" capability=13  scontext=system_u:system_r:collectd_t:s0 tcontext=system_u:system_r:collectd_t:s0 tclass=capability permissive=0
+type=AVC msg=audit(1425559902.216:51668): avc:  denied  { setopt } for  pid=28630 comm="collectd" lport=58 scontext=system_u:system_r:collectd_t:s0 tcontext=system_u:system_r:collectd_t:s0 tclass=rawip_socket permissive=0
+type=AVC msg=audit(1425559997.228:51721): avc:  denied  { write } for  pid=28707 comm="collectd" lport=58 scontext=system_u:system_r:collectd_t:s0 tcontext=system_u:system_r:collectd_t:s0 tclass=rawip_socket permissive=0
+type=AVC msg=audit(1425562059.680:595567): avc:  denied  { read } for  pid=28707 comm="collectd" lport=58 scontext=system_u:system_r:collectd_t:s0 tcontext=system_u:system_r:collectd_t:s0 tclass=rawip_socket permissive=0
 [CTRL-D]
+```
+
+### NTP
+Because there any many discussions on the internet whether to
+use NTPd in the VM or not: before activating an ntpd in the VM, I'll
+check for some time if this is needed.  A ntpd is installed in the VM
+- but configured in the way that it does not set the clock.  collectd
+will pick up the timedifference and sends it to graphite.
+
+```bash
+se_apt-get install ntp
+```
+
+In the ntp.conf file use the 'noselect' option to the server(s):
+this enables collectd to get the time statistics without really
+setting the time.
+
+```
+server ntp.keyweb.de iburst noselect
 ```
 
 #### AIDE

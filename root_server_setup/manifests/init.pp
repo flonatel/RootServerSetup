@@ -50,6 +50,8 @@ class root_server_setup(
   class { 'root_server_setup::dovecot': }
   class { 'root_server_setup::spamfilter': }
   class { 'root_server_setup::apache': }
+  class { 'root_server_setup::ntp': }
+  class { 'root_server_setup::rsync': }
   
   class { 'os_hardening': 
     enable_ipv6 => "true",

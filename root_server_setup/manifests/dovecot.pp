@@ -1,8 +1,7 @@
 class root_server_setup::dovecot {
 
   # From internal network only
-  firewall { "304 allow incoming IMAP (IPv$vers)":
-    provider       => $provider,
+  firewall { "304 allow incoming IMAP (IPv4)":
     chain          => 'INPUT',
     state          => ['NEW'],
     dport          => '143',
